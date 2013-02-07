@@ -1,0 +1,11 @@
+625660c1dfdefa2a17ac67520ebb4438 *DESCRIPTION
+4018d9be0a0bed5f4c42714cd8ef3c50 *NAMESPACE
+a8b0fb4a9a837f922dee916732ca1aed *R/ecosim.r
+838702b438352b24a4f90944cfbabb07 *man/calcres-methods.Rd
+1d90bc773208172c5573ca1cac5b743a *man/calcres.Rd
+6ebc5aff1e3d2ea5d2656c507624c6fd *man/ecosim-package.Rd
+a50c2a36a9d51a15707b33c28bfff98f *man/link-class.Rd
+c782a524536492a188eb42ace4757aea *man/plotres.Rd
+a592bb38c99f42f96d217022c8d1bcb7 *man/process-class.Rd
+cd2b9dc9d3a73ccf070ecf1316193310 *man/reactor-class.Rd
+9259e0562f5aac0480ec4a97a169ab4f *man/system-class.Rd
