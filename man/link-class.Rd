@@ -8,7 +8,7 @@
 \title{Class \code{"link"}}
 
 \description{
-The class represents a link between mixed reactors.
+This class represents a link between mixed reactors.
 A link is characterized by
 the two reactors it connects to,
 the flow through the link,
@@ -56,9 +56,4 @@ Peter Reichert <peter.reichert@eawag.ch>
 \code{\link{plotres}}.
 }
 
-\examples{
-# see
-help(ecosim)
-# for examples.
-}
 

@@ -1,8 +1,8 @@
 Package: ecosim
 Type: Package
 Title: Toolbox for Aquatic Ecosystem Modeling
-Version: 1.00
-Date: 2013-02-07
+Version: 1.01
+Date: 2013-02-13
 Author: Peter Reichert
 Maintainer: Peter Reichert <peter.reichert@eawag.ch>
 Description: Classes and methods for implementing aquatic ecosystem
@@ -10,6 +10,6 @@ Description: Classes and methods for implementing aquatic ecosystem
         results.
 License: GPL (>= 2)
 Depends: methods, deSolve, stoichcalc
-Packaged: 2013-02-07 00:48:41 UTC; Peter
+Packaged: 2013-02-13 23:23:44 UTC; Peter
 Repository: CRAN
-Date/Publication: 2013-02-07 07:51:47
+Date/Publication: 2013-02-14 07:42:08

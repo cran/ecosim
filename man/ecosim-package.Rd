@@ -12,14 +12,23 @@ Toolbox for Aquatic Ecosystem Modeling
 \description{
 Classes and methods for implementing aquatic ecosystem models,
 for running these models, and for visualizing their results. \cr\cr
-Models are constructed by constructing objects of the classes \cr\cr
+Models are built by constructing objects of the classes \cr\cr
 \code{\link{process-class}}, \cr
 \code{\link{reactor-class}}, \cr
 \code{\link{link-class}}, \cr
-\code{\link{system-class}}, \cr\cr
-then, simulations are done using \cr\cr
+\code{\link{system-class}}. \cr\cr
+A transformation processes (\code{\link{process-class}}) is defined by a process rate (expression describing the dependence of the rate on substance or organism concentrations and external influence factors) and stoichiometric coefficients that describe how the rate affects different substances or organisms.
+It is recommended to calculate the stoichiometric coefficients with the function \code{\link{calc.stoich.coef}} of the package \code{\link[stoichcalc:stoichcalc-package]{stoichcalc}} from substance and organism compositions.
+The output of this function can directly be used for the process definition.
+A reactor (\code{\link{reactor-class}}) describes a well-mixed compartment of the environment (or of a laboratory system).
+For each reactor, inflow, outflow, substance and organism input and transformation processes can be defined.
+A link (\code{\link{link-class}}) describes advective and/or diffusive exchange of substances and/or organisms between well-mixed reactors.
+Finally, a system (\code{\link{system-class}}) consists of a single reactor or a set of isolated or linked reactors and can be used to describe a community or meta-community model of an ecosystem and the biogeochemical cycles. \cr\cr
+
+Once a model is described by an object of the class system (\code{\link{system-class}}), simulations can be performed using the member function \cr\cr
 \code{\link{calcres}}, \cr\cr
-and results can be visualized with \cr\cr
+This function integrates the system of ordinary differential equations numerically using the function \code{\link{ode}} of the package \code{\link[deSolve:deSolve-package]{deSolve}} and produces time series of the volumes and substance and organisms concentrations as a R matrix.
+The results can be visualized with arbitrary R functions or a summary of all results can be produced with the function \cr\cr
 \code{\link{plotres}}.
 }
 
@@ -27,8 +36,8 @@ and results can be visualized with \cr\cr
 \tabular{ll}{
 Package: \tab ecosim\cr
 Type: \tab Package\cr
-Version: \tab 1.00\cr
-Date: \tab 2013-02-07\cr
+Version: \tab 1.01\cr
+Date: \tab 2013-02-13\cr
 License: \tab GPL (>= 2)\cr
 Depends: \tab deSolve, stoichcalc\cr
 }
@@ -44,7 +53,9 @@ Maintainer: Peter Reichert <peter.reichert@eawag.ch>
 \references{
 Omlin, M., Reichert, P. and Forster, R., Biogeochemical model of lake Zurich: Model equations and results, Ecological Modelling 141(1-3), 77-103, 2001. \cr\cr
 Reichert, P., Borchardt, D., Henze, M., Rauch, W., Shanahan, P., Somlyody, L. and Vanrolleghem, P., River Water Quality Model no. 1 (RWQM1): II. Biochemical process equations, Water Sci. Tech. 43(5), 11-30, 2001. \cr\cr
-Reichert, P. and Schuwirth, N., A generic framework for deriving process stoichiometry in environmental models, Environmental Modelling & Software, 25, 1241-1251, 2010.
+Reichert, P. and Schuwirth, N., A generic framework for deriving process stoichiometry in environmental models, Environmental Modelling & Software, 25, 1241-1251, 2010. \cr\cr
+Soetaert, K., Petzoldt, T., and Woodrow Setzer, R. Solving differential equations in R: Package deSolve. Journal of Statistical Software, 33(9), 2010. \cr\cr
+Soetaert, K., Cash, J., and Mazzia, F. Solving Differential Equations in R. Springer, Heidelberg, Germany. 2012.
 }
 
 \keyword{ package }
@@ -52,6 +63,14 @@ Reichert, P. and Schuwirth, N., A generic framework for deriving process stoichi
 \seealso{
 \code{\link[deSolve:deSolve-package]{deSolve}},
 \code{\link[stoichcalc:stoichcalc-package]{stoichcalc}},
+}
+
+\note{The following demos are available:\cr\cr
+lakemodel_simple \cr
+lakemodel_intermediate \cr
+lakemodel_complex \cr
+rivermodel_simple \cr
+rivermodel_complex \cr
 }
 
 \examples{

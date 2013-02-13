@@ -4,7 +4,7 @@
 # -----------------------------------------------------------------
 #
 # Class definitions                First version: Peter Reichert, Nov.  12, 2005
-# -----------------                Last revision: Peter Reichert, Feb.  06, 2013
+# -----------------                Last revision: Peter Reichert, Feb.  13, 2013
 #
 # ==============================================================================
 
@@ -411,7 +411,7 @@ setMethod(f          = "calc.rates.statevar.reactor",
 # ==============================================================================
 
 # First version: Peter Reichert, April 09, 2006
-# Last revision: Peter Reichert, May   20, 2006
+# Last revision: Peter Reichert, Feb.  13, 2013
 
 
 setClass(Class              = "link",
@@ -660,7 +660,7 @@ setMethod(f          = "calc.rates.statevar.link",
 #                     of the class "link" defined above). 
 #   
 # Available member functions for external use:
-#   calcres(system,method="lsoda"): 
+#   calcres(system,method="lsoda",...): 
 #                     Calculation of results (volume and concentration time
 #                     series for the system) in the form of a matrix.
 
@@ -693,7 +693,7 @@ setClass(Class             = "system",
 # The rates are calculated under consideration of input, inflow, outflow, and
 # active processes specified in the reactor definition.
 
-calcres <- function(system,method="lsoda") {return(NULL)}
+calcres <- function(system,method="lsoda",...) {return(NULL)}
 setGeneric("calcres")
 
 
@@ -873,7 +873,7 @@ system.rhs <- function(t,x,param,system)
 
 setMethod(f          = "calcres",
           signature  = "system",
-          definition = function(system,method="lsoda")
+          definition = function(system,method="lsoda",...)
                        {
                           # evaluate global environmental conditions:
                           # -----------------------------------------
@@ -988,7 +988,8 @@ setMethod(f          = "calcres",
                                    func   = system.rhs,
                                    parms  = system@param,
                                    method = method,
-                                   system = system)
+                                   system = system,
+                                   ...)
                           rownames(x) <- x[,1]
                           x <- x[,-1]
                           
@@ -1044,13 +1045,13 @@ setMethod(f          = "calcres",
 # Plot all columns of a matrix using the row labels as the common x-axis
 # ======================================================================
 
-plotres <- function(res,colnames=list(),file="",...)
+plotres <- function(res,colnames=list(),file=NA,...)
 {
    if ( length(colnames) < 1 )  # plot all columns
    {
       num.col <- as.integer(sqrt(ncol(res))+0.9999)
       num.row <- as.integer(ncol(res)/num.col+0.9999)
-      if ( nchar(file) > 0 ) { pdf(file=file,...) }
+      if ( !is.na(file) ) { pdf(file=file,...) }
       par.def <- par(no.readonly=TRUE)
       par(mfrow=c(num.row,num.col),
           xaxs="i",yaxs="i",
@@ -1059,13 +1060,13 @@ plotres <- function(res,colnames=list(),file="",...)
       for ( i in 1:ncol(res) )
       {
          plot(t,res[,i],
-              ylim=c(0,1.1*max(res[,i])),
+              ylim=c(0,1.1*max(res[is.finite(res[,i]),i])),
               type="l",
               main=colnames(res)[i],
               xlab="t",ylab=colnames(res)[i])
       }
       par(par.def)
-      if ( nchar(file) > 0 ) { dev.off() }
+      if ( !is.na(file) > 0 ) { dev.off() }
    }
    else   # plot selected columns
    {
@@ -1074,7 +1075,7 @@ plotres <- function(res,colnames=list(),file="",...)
       else                     { cols <- list(colnames) }
       num.col <- as.integer(sqrt(length(cols))+0.9999)
       num.row <- as.integer(length(cols)/num.col+0.9999)
-      if ( nchar(file) > 0 ) { pdf(file=file,...) }
+      if ( !is.na(file) > 0 ) { pdf(file=file,...) }
       par.def <- par(no.readonly=TRUE)
       par(mfrow=c(num.row,num.col),
           xaxs="i",yaxs="i",
@@ -1082,9 +1083,14 @@ plotres <- function(res,colnames=list(),file="",...)
       t <- as.numeric(row.names(res))
       for ( i in 1:length(cols) )
       {
+         ymax <- 0
+         for ( j in 1:length(cols[[i]]) )
+         {
+            ymax <- max(ymax,res[is.finite(res[,cols[[i]][j]]),cols[[i]][j]])
+         }
          plot(numeric(0),numeric(0),
-              xlim=c(min(t),max(t)),
-              ylim=c(0,1.4*max(res[,cols[[i]]])),
+              xlim=c(min(t,na.rm=TRUE),max(t,na.rm=TRUE)),
+              ylim=c(0,1.4*ymax),
               main=paste(cols[[i]],collapse=", "),
               xlab="t",ylab=paste(cols[[i]],collapse=", "))
          for ( j in 1:length(cols[[i]]) )
@@ -1095,7 +1101,7 @@ plotres <- function(res,colnames=list(),file="",...)
                 lty=1:length(cols[[i]]),col=1:length(cols[[i]]))
       }
       par(par.def)
-      if ( nchar(file) > 0 ) { dev.off() }
+      if ( !is.na(file) > 0 ) { dev.off() }
    }
 }
 

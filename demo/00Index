@@ -1,0 +1,5 @@
+lakemodel_simple       Simple lake phyto- and zooplankton model
+lakemodel_intermediate Two box oxygen, phosphorus and plankton lake model 
+lakemodel_complex      Two box oxygen, phosphorus, nitrogen and plankton lake model
+rivermodel_simple      Simple river model for dissolved substances
+rivermodel_complex     Benthic organisms and dissolved substances river model
