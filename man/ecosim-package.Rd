@@ -9,6 +9,17 @@
 Toolbox for Aquatic Ecosystem Modeling
 }
 
+\details{
+\tabular{ll}{
+Package: \tab ecosim\cr
+Type: \tab Package\cr
+Version: \tab 1.2\cr
+Date: \tab 2014-02-11\cr
+License: \tab GPL (>= 2)\cr
+Depends: \tab deSolve, stoichcalc\cr
+}
+}
+
 \description{
 Classes and methods for implementing aquatic ecosystem models,
 for running these models, and for visualizing their results. \cr\cr
@@ -29,19 +40,12 @@ Once a model is described by an object of the class system (\code{\link{system-c
 \code{\link{calcres}}, \cr\cr
 This function integrates the system of ordinary differential equations numerically using the function \code{\link{ode}} of the package \code{\link[deSolve:deSolve-package]{deSolve}} and produces time series of the volumes and substance and organisms concentrations as a R matrix.
 The results can be visualized with arbitrary R functions or a summary of all results can be produced with the function \cr\cr
-\code{\link{plotres}}.
-}
-
-\details{
-\tabular{ll}{
-Package: \tab ecosim\cr
-Type: \tab Package\cr
-Version: \tab 1.01\cr
-Date: \tab 2013-02-13\cr
-License: \tab GPL (>= 2)\cr
-Depends: \tab deSolve, stoichcalc\cr
-}
-
+\code{\link{plotres}}. \cr\cr
+To propagate stochasticity and uncertainty to the results, stochastic parameter time series can be generated with the function \cr\cr
+\code{\link{randou}} \cr\cr
+and parameter samples can be sampled with the function \cr\cr
+\code{\link{randnorm}} \cr\cr
+to get a sample from the predictive distribution by Monte Carlo simulation.
 }
 
 \author{

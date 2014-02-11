@@ -19,6 +19,7 @@ plotres(res, colnames = list(), file = NA, ...)
 \arguments{
   \item{res}{
 Numerical matrix all or selected columns of which are to be plotted as a function of the row names.
+If a list of matrices is provided, simulation results are plotted for all list elements (each of which must be a matrix with the required columns).
 }
   \item{colnames}{
 Selection of column names to be plotted. An empty list indicates that all columns should be plotted.

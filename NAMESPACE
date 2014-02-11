@@ -1,3 +1,6 @@
 export("plotres")
+export("randnorm")
+export("randou")
 exportMethods("calcres")
 exportClasses("process","reactor","link","system")
+import(methods,deSolve,stoichcalc)

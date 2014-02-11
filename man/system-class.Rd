@@ -25,7 +25,7 @@ Objects can be created by calls of the form \code{new("system", ...)}.
     \item{\code{reactors}:}{List of reactors that build the system.}
     \item{\code{links}:}{List of links that connect the reactors.}
     \item{\code{cond}:}{List of expressions that specify global environmental conditions to which all reactrs are exposed.}
-    \item{\code{param}:}{List of model parameters}
+    \item{\code{param}:}{List of model parameters in the form of numerical values or lists of vectors for x and y values describing a realization of a time-dependent parameter.}
     \item{\code{t.out}:}{Numeric vector of points in time at which output should be calculated.}
   }
 }

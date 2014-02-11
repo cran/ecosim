@@ -4,7 +4,7 @@
 # -----------------------------------------------------------------
 #
 # Class definitions                First version: Peter Reichert, Nov.  12, 2005
-# -----------------                Last revision: Peter Reichert, Feb.  13, 2013
+# -----------------                Last revision: Peter Reichert, Feb.  01, 2014
 #
 # ==============================================================================
 
@@ -414,7 +414,7 @@ setMethod(f          = "calc.rates.statevar.reactor",
 # Last revision: Peter Reichert, Feb.  13, 2013
 
 
-setClass(Class              = "link",
+setClass(Class             = "link",
          representation 
          = list(name       = "character",   # name of advective link
                 from       = "character",   # name of reactor from which the 
@@ -638,7 +638,7 @@ setMethod(f          = "calc.rates.statevar.link",
 # ==============================================================================
 
 # First version: Peter Reichert, Nov.  12, 2005
-# Last revision: Peter Reichert, Feb.  06, 2013
+# Last revision: Peter Reichert, Jan.  26, 2014
 
 # An object of this class defines a system consisting of mixed reactors.
 # Through the definition of the reactors, it includes the substances or
@@ -686,10 +686,9 @@ setClass(Class             = "system",
 # =================================================
        
 # Calculation of model results  
-#   param:    Model parameters.
-#   cond:     Environmental conditions.
-#   conc:     Substance concentrations.
-#   t:        time.
+#   system:   Object of type system defining the model.
+#   method:   Integration algorithm passed to function ode from deSolve.
+#   ...       Further arguments passed to ode.
 # The rates are calculated under consideration of input, inflow, outflow, and
 # active processes specified in the reactor definition.
 
@@ -712,6 +711,19 @@ get.reactor.index <- function(name,reactors)
    return(NA)
 }
 
+# Define auxiliary function to interpolate time-dependent parameters:
+# -------------------------------------------------------------------
+
+get.param.val <- function(param,t)
+{
+   param.val <- param
+   for ( i in 1:length(param) )
+   {
+     if ( length(param[[i]]) != 1 ) param.val[[i]] <- approx(x=param[[i]],xout=t,rule=2)$y
+   }
+   return(param.val)
+}
+
       
 # Define auxiliary function for right hand side of differential equation:
 # -----------------------------------------------------------------------
@@ -721,9 +733,14 @@ system.rhs <- function(t,x,param,system)
    # state variables are volume, masses of dissolved or suspended substances
    # or organisms, and masses of attached substances or organisms.
    
+   # interpolate time-dependent parameters:
+   # --------------------------------------
+  
+   param.val <- get.param.val(system@param,t)
+  
    # combine rates of all reactors:
    # ------------------------------
-
+  
    num.react  <- length(system@reactors)
    offsets    <- numeric(num.react)
    num.vol    <- numeric(num.react)
@@ -760,7 +777,7 @@ system.rhs <- function(t,x,param,system)
       cond.global <- list()
       if ( length(system@cond) > 0 )
       {
-         env <- c(param,as.list(conc[[k]]),list(t=t))
+         env <- c(param.val,as.list(conc[[k]]),list(t=t))
          for ( l in 1:length(system@cond) )
          {
             cond.l <- eval(expr  = system@cond[[l]],
@@ -776,7 +793,7 @@ system.rhs <- function(t,x,param,system)
       # calculate rates within individual reactors:
       # -------------------------------------------
       
-      rhs.current <- calc.rates.statevar.reactor(reactor,param,cond.global,
+      rhs.current <- calc.rates.statevar.reactor(reactor,param.val,cond.global,
                                                  volume,conc[[k]],t)
       
       # combine rates of current reactor with rates of previous reactors:
@@ -806,7 +823,7 @@ system.rhs <- function(t,x,param,system)
          offset.from <- offsets[ind.from]
          offset.to   <- offsets[ind.to]
          rhs.contrib <- 
-            calc.rates.statevar.link(link,param,cond.global,
+            calc.rates.statevar.link(link,param.val,cond.global,
                                      conc[[ind.from]][1:num.vol[ind.from]],
                                      conc[[ind.to]][1:num.vol[ind.to]],t)
 
@@ -875,13 +892,18 @@ setMethod(f          = "calcres",
           signature  = "system",
           definition = function(system,method="lsoda",...)
                        {
+                          # interpolate time-dependent parameters:
+                          # --------------------------------------
+            
+                          param.val <- get.param.val(system@param,system@t.out[1])
+            
                           # evaluate global environmental conditions:
                           # -----------------------------------------
 
                           cond.global <- list()
                           if ( length(system@cond) > 0 )
                           {
-                             env <- c(system@param,list(t=system@t.out[1]))
+                             env <- c(param.val,list(t=system@t.out[1]))
                              for ( l in 1:length(system@cond) )
                              {
                                 cond.l <- eval(expr  = system@cond[[l]],
@@ -893,7 +915,7 @@ setMethod(f          = "calcres",
                              }
                              names(cond.global) <- names(system@cond)
                           }
-                          env.global = c(system@param,cond.global,
+                          env.global = c(param.val,cond.global,
                                          list(t=system@t.out[1]))
 
                           # initialize masses:
@@ -986,7 +1008,7 @@ setMethod(f          = "calcres",
                           x <- ode(y      = x.ini,
                                    times  = system@t.out,
                                    func   = system.rhs,
-                                   parms  = system@param,
+                                   parms  = NA,
                                    method = method,
                                    system = system,
                                    ...)
@@ -1035,11 +1057,147 @@ setMethod(f          = "calcres",
 
 
 # ==============================================================================
+# Draw from Normal distribution
+# ==============================================================================
+
+# First version: Peter Reichert, Jan. 25, 2014
+# Last revision: Peter Reichert, Jan. 25, 2014
+
+# This function draws from a Normal or Lognormal random variable with parameters
+# valid in original units.
+
+# Arguments: 
+#   mean:     Mean of the random variable.
+#   sd:       Standard deviation of the random variable.
+#   log:      Indicator whether the log of the variable should be
+#             normally distributed (log=TRUE) rather than the
+#             variable itself.
+#             (Note: mean and sd are interpreted in original units
+#             also for log=TRUE.)
+#   n:        Sample size.
+
+
+randnorm <- function(mean=0,sd=1,log=FALSE,n=1)
+{
+  # consistency checks:
+  
+  if ( n < 1 )
+  {
+    warning("n must a positive integer")
+    return(NA)
+  }
+  if ( sd < 0 )
+  {
+    warning("sd must be non-negative")
+    return(rep(NA,n))
+  }
+  
+  # draw and return sample:
+  
+  if ( !log )
+  {
+    return(rnorm(n=n,mean=mean,sd=sd))
+  }
+  else
+  {
+    if ( mean <= 0 )
+    {
+      warning("if log=TRUE, mean must be positive")
+      return(rep(NA,n))
+    }
+    meanlog <- log(mean/(sqrt(1+sd*sd/(mean*mean))))
+    sdlog   <- sqrt(log(1+sd*sd/(mean*mean)))
+    return(exp(rnorm(n=n,mean=meanlog,sd=sdlog)))
+  }
+}
+
+
+# ==============================================================================
+# Draw from Ornstein-Uhlenbeck process
+# ==============================================================================
+
+# First version: Peter Reichert, Jan. 25, 2014
+# Last revision: Peter Reichert, Jan. 25, 2014
+
+# This function draws a realization of an Ornstein-Uhlenbeck process.
+
+# Arguments: 
+#   mean:     Asymptotic mean of the process.
+#   sd:       Asymptotic standard deviation of the process.
+#   tau:      Correlation time of the process.
+#   y0:       Starting value of the process.
+#   t:        Time points at which the process should be sampled.
+#             (Note: the value at t[1] will be the starting value y0.)
+#   log:      Indicator whether the log of the variable should be an
+#             Ornstein-Uhlenbeck process (log=TRUE) rather than the
+#             variable itself.
+#             (Note: mean and sd are interpreted in original units
+#             also for log=TRUE.)
+
+randou <- function(mean=0,sd=1,tau=0.1,y0=NA,t=0:1000/1000,log=FALSE)
+{
+  # consistency checks:
+  
+  if ( min(diff(t)) <= 0 )
+  {
+     warning("t must be strictly increasing")
+     return(NA)
+  }
+  if ( sd < 0 )
+  {
+    warning("sd must be non-negative")
+    return(NA)
+  }
+  if ( tau <= 0 )
+  {
+    warning("tau must be positive")
+    return(NA)
+  }
+    
+  # calculate exp of log if log=TRUE (note: mean and sd are in original units):
+  
+  if ( log ) 
+  {
+    if ( mean <= 0 )
+    {
+      warning("if log=TRUE, mean must be positive")
+      return(NA)
+    }
+    meanlog <- log(mean/(sqrt(1+sd*sd/(mean*mean))))
+    sdlog   <- sqrt(log(1+sd*sd/(mean*mean)))
+    res <- randou(mean = meanlog,
+                  sd   = sdlog,
+                  tau  = tau,
+                  y0   = log(y0),
+                  t    = t,
+                  log  = FALSE)
+    res$y <- exp(res$y)
+    return(res)
+  }
+  else
+  {  
+    # draw and return sample:
+  
+    y <- rep(NA,length(t))
+    y[1] <- y0
+    if ( is.na(y0) ) y[1] <- rnorm(n=1,mean=mean,sd=sd)
+    for ( i in 2:length(t) )
+    {
+      y[i] <- rnorm(n    = 1,
+                    mean = mean+(y[i-1]-mean)*exp(-(t[i]-t[i-1])/tau),
+                    sd   = sd*sqrt(1-exp(-2*(t[i]-t[i-1])/tau)))
+    }
+    return(list(x=t,y=y))
+  }
+}
+
+
+# ==============================================================================
 # Plot simulation results
 # ==============================================================================
 
 # First version: Peter Reichert, April 09, 2006
-# Last revision: Peter Reichert, May   01, 2006
+# Last revision: Peter Reichert, Feb.  01, 2014
 
 
 # Plot all columns of a matrix using the row labels as the common x-axis
@@ -1047,62 +1205,43 @@ setMethod(f          = "calcres",
 
 plotres <- function(res,colnames=list(),file=NA,...)
 {
-   if ( length(colnames) < 1 )  # plot all columns
+   r <- res
+   if ( !is.list(r) ) r <- list(r)
+   cols <- colnames
+   if ( !is.list(cols) )   cols <- list(cols)
+   if ( length(cols) < 1 ) cols <- as.list(colnames(r[[1]]))
+   num.col <- as.integer(sqrt(length(cols))+0.9999)
+   num.row <- as.integer(length(cols)/num.col+0.9999)
+   if ( !is.na(file) ) { pdf(file=file,...) }
+   par.def <- par(no.readonly=TRUE)
+   par(mfrow=c(num.row,num.col),
+       xaxs="i",yaxs="i",
+       mar=c(5,4.5,2,2))  # bottom,left,top,right
+   t <- as.numeric(row.names(r[[1]]))
+   for ( i in 1:length(cols) )
    {
-      num.col <- as.integer(sqrt(ncol(res))+0.9999)
-      num.row <- as.integer(ncol(res)/num.col+0.9999)
-      if ( !is.na(file) ) { pdf(file=file,...) }
-      par.def <- par(no.readonly=TRUE)
-      par(mfrow=c(num.row,num.col),
-          xaxs="i",yaxs="i",
-          mar=c(5,4.5,2,2))  # bottom,left,top,right
-      t <- as.numeric(row.names(res))
-      for ( i in 1:ncol(res) )
+      ymax <- 0
+      for ( j in 1:length(cols[[i]]) )
       {
-         plot(t,res[,i],
-              ylim=c(0,1.1*max(res[is.finite(res[,i]),i])),
-              type="l",
-              main=colnames(res)[i],
-              xlab="t",ylab=colnames(res)[i])
+         ymax <- max(ymax,r[[1]][is.finite(r[[1]][,cols[[i]][j]]),cols[[i]][j]])
       }
-      par(par.def)
-      if ( !is.na(file) > 0 ) { dev.off() }
-   }
-   else   # plot selected columns
-   {
-      cols <- list()
-      if ( is.list(colnames) ) { cols <- colnames }
-      else                     { cols <- list(colnames) }
-      num.col <- as.integer(sqrt(length(cols))+0.9999)
-      num.row <- as.integer(length(cols)/num.col+0.9999)
-      if ( !is.na(file) > 0 ) { pdf(file=file,...) }
-      par.def <- par(no.readonly=TRUE)
-      par(mfrow=c(num.row,num.col),
-          xaxs="i",yaxs="i",
-          mar=c(5,4.5,2,2))  # bottom,left,top,right
-      t <- as.numeric(row.names(res))
-      for ( i in 1:length(cols) )
+      plot(numeric(0),numeric(0),
+           xlim=c(min(t,na.rm=TRUE),max(t,na.rm=TRUE)),
+           ylim=c(0,1.4*ymax),
+           main=paste(cols[[i]],collapse=", "),
+           xlab="t",ylab=paste(cols[[i]],collapse=", "))
+      for ( j in 1:length(cols[[i]]) )
       {
-         ymax <- 0
-         for ( j in 1:length(cols[[i]]) )
+         for ( k in 1:length(r) )
          {
-            ymax <- max(ymax,res[is.finite(res[,cols[[i]][j]]),cols[[i]][j]])
+            lines(t,r[[k]][,cols[[i]][j]],lty=j,col=j)
          }
-         plot(numeric(0),numeric(0),
-              xlim=c(min(t,na.rm=TRUE),max(t,na.rm=TRUE)),
-              ylim=c(0,1.4*ymax),
-              main=paste(cols[[i]],collapse=", "),
-              xlab="t",ylab=paste(cols[[i]],collapse=", "))
-         for ( j in 1:length(cols[[i]]) )
-         {
-            lines(t,res[,cols[[i]][j]],lty=j,col=j)
-         }
-         legend("topright",legend=cols[[i]],
-                lty=1:length(cols[[i]]),col=1:length(cols[[i]]))
       }
-      par(par.def)
-      if ( !is.na(file) > 0 ) { dev.off() }
+      legend("topright",legend=cols[[i]],
+             lty=1:length(cols[[i]]),col=1:length(cols[[i]]))
    }
+   par(par.def)
+   if ( !is.na(file) ) { dev.off() }
 }
 
 
