@@ -1,57 +1,39 @@
-\name{ecosim-package}
+\name{calcsens}
 
-\alias{ecosim-package}
-\alias{ecosim}
-
-\docType{package}
+\alias{calcsens}
 
 \title{
-Toolbox for Aquatic Ecosystem Modeling
-}
-
-\details{
-\tabular{ll}{
-Package: \tab ecosim\cr
-Type: \tab Package\cr
-Version: \tab 1.3\cr
-Date: \tab 2017-02-13\cr
-License: \tab GPL (>= 2)\cr
-Depends: \tab deSolve, stoichcalc\cr
-}
+Performs a Sensitivity Analysis of the Model Passed as the Argument
 }
 
 \description{
-Classes and methods for implementing aquatic ecosystem models,
-for running these models, and for visualizing their results. \cr\cr
-Models are built by constructing objects of the classes \cr\cr
-\code{\link{process-class}}, \cr
-\code{\link{reactor-class}}, \cr
-\code{\link{link-class}}, \cr
-\code{\link{system-class}}. \cr\cr
-A transformation processes (\code{\link{process-class}}) is defined by a process rate (expression describing the dependence of the rate on substance or organism concentrations and external influence factors) and stoichiometric coefficients that describe how the rate affects different substances or organisms.
-It is recommended to calculate the stoichiometric coefficients with the function \code{\link{calc.stoich.coef}} of the package \code{\link[stoichcalc:stoichcalc-package]{stoichcalc}} from substance and organism compositions.
-The output of this function can directly be used for the process definition.
-A reactor (\code{\link{reactor-class}}) describes a well-mixed compartment of the environment (or of a laboratory system).
-For each reactor, inflow, outflow, substance and organism input and transformation processes can be defined.
-A link (\code{\link{link-class}}) describes advective and/or diffusive exchange of substances and/or organisms between well-mixed reactors.
-Finally, a system (\code{\link{system-class}}) consists of a single reactor or a set of isolated or linked reactors and can be used to describe a community or meta-community model of an ecosystem and the biogeochemical cycles. \cr\cr
-
-Once a model is described by an object of the class system (\code{\link{system-class}}), simulations can be performed using the member function \cr\cr
-\code{\link{calcres}}, \cr\cr
-This function integrates the system of ordinary differential equations numerically using the function \code{\link{ode}} of the package \code{\link[deSolve:deSolve-package]{deSolve}} and produces time series of the volumes and substance and organisms concentrations as a R matrix.
-The results can be visualized with arbitrary R functions or a summary of all results can be produced with the function \cr\cr
-\code{\link{plotres}}. \cr\cr
-To propagate stochasticity and uncertainty to the results, stochastic parameter time series can be generated with the function \cr\cr
-\code{\link{randou}} \cr\cr
-and parameter samples can be sampled with the function \cr\cr
-\code{\link{randnorm}} \cr\cr
-to get a sample from the predictive distribution by Monte Carlo simulation.
+Calculates dynamic solutions of the model defined by the argument with modified parameter values.
+Each of the specified parameters is multiplied in sequence by the provided scaling factors to produce
+complete model output matrices for all individual parameter modifications. 
 }
 
-\author{
-Peter Reichert
+\usage{
+calcsens(system, param.sens, scaling.factors=c(1,0.5,2))}
 
-Maintainer: Peter Reichert <peter.reichert@eawag.ch>
+\arguments{
+  \item{system}{
+Object of type \code{\link{system-class}} that defines the model.
+}
+  \item{param.sens}{
+Vector of parameter names for which sensitivity analysis should be performed.
+The names must be a subset of the names used in the parameter entry of the argument \code{system}.
+}
+  \item{scaling.factors}{
+Numerical vector of scaling factors with which the parameters should be multiplied.
+It is recommended that the scaling factors include unity as the first entry to get the basic simulation results.
+The default is to use the scaling factors 1, 0.5 and 2.
+}
+}
+
+\value{
+The function returns a list of lists of result matrices of the method \code{\link{calcres-methods}}.
+The outer list is over the parameters, the inner list over the different values of each parameter.
+Note that the function \code{\link{plotres}} can be used to plot the results.
 }
 
 \references{
@@ -62,19 +44,17 @@ Soetaert, K., Petzoldt, T., and Woodrow Setzer, R. Solving differential equation
 Soetaert, K., Cash, J., and Mazzia, F. Solving Differential Equations in R. Springer, Heidelberg, Germany. 2012.
 }
 
-\keyword{ package }
-
-\seealso{
-\code{\link[deSolve:deSolve-package]{deSolve}},
-\code{\link[stoichcalc:stoichcalc-package]{stoichcalc}},
+\author{
+Peter Reichert <peter.reichert@eawag.ch>
 }
 
-\note{The following demos are available:\cr\cr
-lakemodel_simple \cr
-lakemodel_intermediate \cr
-lakemodel_complex \cr
-rivermodel_simple \cr
-rivermodel_complex \cr
+\seealso{
+\code{\link{process-class}},
+\code{\link{reactor-class}},
+\code{\link{link-class}},
+\code{\link{system-class}},
+\code{\link{plotres}}.
+\code{\link{calcres-methods}}.
 }
 
 \examples{
@@ -193,3 +173,4 @@ plotres(res      = res,    # plot to pdf file
         width    = 8,
         height   = 4)
 }
+

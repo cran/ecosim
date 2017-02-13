@@ -13,22 +13,65 @@ plots of all or selected columns of a matrix as a function of the row names inte
 }
 
 \usage{
-plotres(res, colnames = list(), file = NA, ...)
+plotres(res,colnames=list(),
+        file=NA,width=7,height=7,
+        ncol=NA,nrow=NA,
+        lwd=2,
+        col=c("black","red","blue","pink","orange","violet","cyan","brown","purple"),
+        lty=c("solid",paste(2*4:1,2,sep=""),paste(paste(2*4:2,2,sep=""),22,sep="")),
+        main=NA,xlab=NA,ylab=NA)
 }
 
 \arguments{
   \item{res}{
-Numerical matrix all or selected columns of which are to be plotted as a function of the row names.
-If a list of matrices is provided, simulation results are plotted for all list elements (each of which must be a matrix with the required columns).
+Numerical matrix, list of numerical matrices or list of lists of numerical matrices of data to be plotted.
+If \code{res} is a single numerical matrix, all columns or the columns selected under \code{colnames} are plotted 
+versus the row names that are converted to numerics.
+If \code{res} is a list of numerical matrices, the same plots are produced as for a single numerical matrix, 
+but in all plots multiple lines are produced from the different list entries.
+In the legend, the column names are then appended by the names of the lists.
+If \code{res} is a list of lists of numerical matrices, a set of plots according to the description above are produced.
+Note that the format of \code{res} is compatible with the output of the member functions \code{\link{calcres}} and
+\code{\link{calcsens}} of the class \code{\link{system-class}}.
 }
   \item{colnames}{
-Selection of column names to be plotted. An empty list indicates that all columns should be plotted.
+Selection of column names to be plotted. 
+Each list element defines a plot and may contain a vector of column names in which case multiple lines are plotted
+into the same plot.
+An empty list indicates that all columns should be plotted.
 }
   \item{file}{
 Optional file name to which the plot should be redirected. The file will be written in pdf format.
 }
-  \item{\dots}{
-Further arguments are transferred to the underlying plot routine.
+  \item{width}{
+Optional width of the graphics region of the pdf in inches.
+}
+  \item{height}{
+Optional height of the graphics region of the pdf in inches.
+}
+  \item{ncol}{
+Optional number of columns of plots to be plotted on the same page.
+}
+  \item{nrow}{
+Optional number of rows of plots to be plotted on the same page.
+}
+  \item{lwd}{
+Optional line width(s); values are recycled if more lines are plotted then line widths provided.
+}
+  \item{lty}{
+Optional line type(s); values are recycled if more lines are plotted then line types provided.
+}
+  \item{col}{
+Optional line color(s); values are recycled if more lines are plotted then line colors provided.
+}
+  \item{main}{
+Optional title(s) of plots; values are recycled if more plots are produced than titles provided.
+}
+  \item{xlab}{
+Optional label(s) of the x axes; values are recycled if more plots are produced than labels provided.
+}
+  \item{ylab}{
+Optional label(s) of the y axes; values are recycled if more plots are produced than labels provided.
 }
 }
 

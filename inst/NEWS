@@ -1,0 +1,42 @@
+================================
+Change history of ecosim package
+================================
+
+
+Changes version 1.2 (11.02.2014) -> version 1.3 (13.02.2017)
+============================================================
+
+PR: Function "plotres" extended with many additional arguments to increase 
+    the flexibility of plots. In addition, the user can now provide a single
+    matrix of results, a list of matrices or a list of lists of matrices.
+    The function is now compatible with the output of both functions
+    "calcres" and "calcsens".
+
+PR: Function "calcsens" for sensitivity analysis added. 
+
+
+Changes version 1.01 (13.02.2013) -> version 1.2 (11.02.2014)
+=============================================================
+
+PR: Option for time-dependent parameters added.
+
+PR: Functions randnorm and randou for uncertainty analysis added.
+
+PR: Function "plotres" extended to plot multiple curves from list of results.
+
+
+Changes version 1.0 (07.02.2013) -> version 1.01 (13.02.2013)
+=============================================================
+
+PR: Arguments "..." added to function "calcres". 
+    These arguments are passed to the solver.
+
+PR: Documentation improved.
+
+PR: Demo examples added.
+
+PR: plotres modified to allow for plotting even if some values are Inf, 
+    NaN or NA
+
+
+

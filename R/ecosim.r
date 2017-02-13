@@ -4,7 +4,7 @@
 # -----------------------------------------------------------------
 #
 # Class definitions                First version: Peter Reichert, Nov.  12, 2005
-# -----------------                Last revision: Peter Reichert, Feb.  01, 2014
+# -----------------                Last revision: Peter Reichert, Feb.  12, 2017
 #
 # ==============================================================================
 
@@ -1056,6 +1056,40 @@ setMethod(f          = "calcres",
                        })
 
 
+# Method for calculating sensitivity analyses:
+# ============================================
+
+# Calculation of model results  
+#   system:          object of type system defining the model.
+#   param.sens:      names of parameters for which sensitivity analysis should be performed.
+#   scaling.factors: scaling factors for sensitivity analysis
+
+calcsens <- function(system, param.sens, scaling.factors=c(1,0.5,2)) {return(NULL)}
+setGeneric("calcsens")
+
+setMethod(f          = "calcsens",
+          signature  = "system",
+          definition = function(system, param.sens, scaling.factors=c(1,0.5,2))
+            {
+              res <- list()
+              param.orig <- system@param
+              for ( j in 1:length(param.sens) )
+              {
+                res[[j]] <- list()
+                for ( i in 1:length(scaling.factors) )
+                {
+                  system@param[[param.sens[j]]] <- system@param[[param.sens[j]]]*scaling.factors[i]
+                  res[[j]][[i]] <- calcres(system)
+                  system@param <- param.orig
+                }
+                names(res[[j]]) <- paste(param.sens[j],scaling.factors,sep="_")
+              }
+              names(res) <- param.sens
+              
+              return(res)  
+            })
+          
+
 # ==============================================================================
 # Draw from Normal distribution
 # ==============================================================================
@@ -1197,51 +1231,179 @@ randou <- function(mean=0,sd=1,tau=0.1,y0=NA,t=0:1000/1000,log=FALSE)
 # ==============================================================================
 
 # First version: Peter Reichert, April 09, 2006
-# Last revision: Peter Reichert, Feb.  01, 2014
+# Last revision: Peter Reichert, February 11, 2017
 
 
 # Plot all columns of a matrix using the row labels as the common x-axis
 # ======================================================================
 
-plotres <- function(res,colnames=list(),file=NA,...)
+plotres <- function(res,colnames=list(),
+                    file=NA,width=7,height=7,
+                    ncol=NA,nrow=NA,
+                    lwd=2,
+                    col=c("black","red","blue","pink","orange","violet","cyan","brown","purple"),
+                    lty=c("solid",paste(2*4:1,2,sep=""),paste(paste(2*4:2,2,sep=""),22,sep="")),
+                    main=NA,xlab=NA,ylab=NA)
 {
-   r <- res
-   if ( !is.list(r) ) r <- list(r)
-   cols <- colnames
-   if ( !is.list(cols) )   cols <- list(cols)
-   if ( length(cols) < 1 ) cols <- as.list(colnames(r[[1]]))
-   num.col <- as.integer(sqrt(length(cols))+0.9999)
-   num.row <- as.integer(length(cols)/num.col+0.9999)
-   if ( !is.na(file) ) { pdf(file=file,...) }
-   par.def <- par(no.readonly=TRUE)
-   par(mfrow=c(num.row,num.col),
-       xaxs="i",yaxs="i",
-       mar=c(5,4.5,2,2))  # bottom,left,top,right
-   t <- as.numeric(row.names(r[[1]]))
-   for ( i in 1:length(cols) )
-   {
+  recyc <- function(x,y)
+  {
+    res <- x %% y
+    if ( res == 0 ) res <- y
+    return(res)
+  }
+  
+  # transform r into a list (for different plots) of a list (for different curves in each plot) of matrices:
+  
+  r <- res
+  if ( is.data.frame(r) | is.matrix(r) )
+  {
+    r <- list(list(r))
+  }
+  else
+  {
+    if ( !is.list(r) )
+    {
+      cat("*** res must be a matrix, a data frame, or a list (of a list) of matrices or data frames\n")
+      return()
+    }
+    if ( is.data.frame(r[[1]]) | is.matrix(r[[1]]) )
+    {
+      r <- list(r)
+    }
+    else
+    {
+      if ( !is.matrix(r[[1]][[1]]) & !is.data.frame(r[[1]][[1]]) )
+      {
+        cat("*** res must be a matrix, a data frame, or a list (of a list) of matrices or data frames\n")
+        return()
+      }
+    }
+  }
+
+  # open output file:
+  
+  if ( !is.na(file) ) { pdf(file=file,width=width,height=height) }
+
+  # loop over different plots:
+  
+  for ( p in 1:length(r) )
+  {
+    K <- length(r[[p]])
+    labels <- TRUE
+    if ( length(names(r[[p]])) != K ) labels <- FALSE
+    
+    # determine variables to be plotted and number of columns and rows for plot i:
+    
+    cols <- colnames
+    if ( !is.list(cols) ) cols <- list(cols)
+    if ( length(cols) < 1 ) cols <- as.list(colnames(r[[p]][[1]]))
+    num.col <- ncol
+    num.row <- nrow
+    if ( is.na(num.row) )
+    {
+      if ( is.na(num.col) )
+      {
+        num.col <- as.integer(sqrt(length(cols))+0.9999)
+      }
+      num.row <- as.integer(length(cols)/num.col+0.9999)
+    }
+    else
+    {
+      if ( is.na(num.col) )
+      {
+        num.col <- as.integer(length(cols)/num.row+0.9999)
+      }
+    }
+    
+    # set-up plot frame:
+    
+    par(mfrow=c(num.row,num.col),
+        xaxs="i",yaxs="i",
+        mar=c(5,4.5,2,2))  # bottom,left,top,right
+    
+    # determine x-axis:
+    
+    t <- as.numeric(row.names(r[[p]][[1]]))
+    if ( length(r[[p]]) > 1 ) { for(k in 2:length(r[[p]])) t <- c(t,as.numeric(row.names(r[[p]][[k]]))) }
+
+    for ( i in 1:length(cols) )
+    {
+      
+      # set-up individual plots:
+      
+      lty.loc <- lty
+      if ( is.na(lty[1]) ) lty.loc <- 1:(length(cols[[i]])*K)
+      col.loc <- col
+      if ( is.na(col[1]) ) col.loc <- 1:(length(cols[[i]])*K)
       ymax <- 0
       for ( j in 1:length(cols[[i]]) )
       {
-         ymax <- max(ymax,r[[1]][is.finite(r[[1]][,cols[[i]][j]]),cols[[i]][j]])
+        for ( k in 1:K )
+        {
+          ymax <- max(ymax,r[[p]][[k]][is.finite(r[[p]][[k]][,cols[[i]][j]]),cols[[i]][j]])
+        }
       }
+      main.loc <- main
+      if ( is.na(main.loc[1]) ) main.loc <- paste(cols[[i]],collapse=", ")
+      xlab.loc <- xlab
+      if ( is.na(xlab.loc[1]) ) xlab.loc <- "t"
+      ylab.loc <- ylab
+      if ( is.na(ylab.loc[1]) ) ylab.loc <- paste(cols[[i]],collapse=", ")
+      
+      # write individual plots:
+      
       plot(numeric(0),numeric(0),
            xlim=c(min(t,na.rm=TRUE),max(t,na.rm=TRUE)),
            ylim=c(0,1.4*ymax),
-           main=paste(cols[[i]],collapse=", "),
-           xlab="t",ylab=paste(cols[[i]],collapse=", "))
+           main=main.loc[recyc(i,length(main.loc))],
+           xlab=xlab.loc[recyc(i,length(xlab.loc))],
+           ylab=ylab.loc[recyc(i,length(ylab.loc))])
+      leg     = character(0)
+      col.leg = numeric(0)
+      lty.leg = numeric(0)
+      lwd.leg = numeric(0)
       for ( j in 1:length(cols[[i]]) )
       {
-         for ( k in 1:length(r) )
-         {
-            lines(t,r[[k]][,cols[[i]][j]],lty=j,col=j)
-         }
+        for ( k in 1:K )
+        {
+          if ( labels )
+          {
+            col.jk <- col.loc[recyc((j-1)*K+k,length(col.loc))]
+            lty.jk <- lty.loc[recyc((j-1)*K+k,length(lty.loc))]
+            lwd.jk <- lwd[recyc((j-1)*K+k,length(lwd))]
+          }
+          else
+          {
+            col.jk <- col.loc[recyc(j,length(col.loc))]
+            lty.jk <- lty.loc[recyc(j,length(lty.loc))]
+            lwd.jk <- lwd[recyc(j,length(lwd))]
+          }
+          lines(as.numeric(row.names(r[[p]][[k]])),r[[p]][[k]][,cols[[i]][j]],col=col.jk,lty=lty.jk,lwd=lwd.jk)
+          if ( K == 1 | ( k==1 & !labels ) ) 
+          {
+            leg <- c(leg,cols[[i]][[j]]) 
+          }
+          else
+          {
+            if ( labels) leg <- c(leg,paste(cols[[i]][[j]],names(r[[p]])[k],sep=" | "))
+          }
+          if ( k == 1 | labels )
+          {
+            col.leg <- c(col.leg,col.jk)
+            lty.leg <- c(lty.leg,lty.jk)
+            lwd.leg <- c(lwd.leg,lwd.jk)
+          }
+        }
       }
-      legend("topright",legend=cols[[i]],
-             lty=1:length(cols[[i]]),col=1:length(cols[[i]]))
-   }
-   par(par.def)
-   if ( !is.na(file) ) { dev.off() }
-}
+      legend("topright",legend=leg,col=col.leg,lty=lty.leg,lwd=lwd.leg)
+    }
 
+    # end loop over different plots:
+  
+  }
+
+  # close output file:
+
+  if ( !is.na(file) ) dev.off()
+}
 
