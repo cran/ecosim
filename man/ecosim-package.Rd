@@ -13,8 +13,8 @@ Toolbox for Aquatic Ecosystem Modeling
 \tabular{ll}{
 Package: \tab ecosim\cr
 Type: \tab Package\cr
-Version: \tab 1.3\cr
-Date: \tab 2017-02-13\cr
+Version: \tab 1.3-1\cr
+Date: \tab 2019-02-20\cr
 License: \tab GPL (>= 2)\cr
 Depends: \tab deSolve, stoichcalc\cr
 }
@@ -35,17 +35,23 @@ A reactor (\code{\link{reactor-class}}) describes a well-mixed compartment of th
 For each reactor, inflow, outflow, substance and organism input and transformation processes can be defined.
 A link (\code{\link{link-class}}) describes advective and/or diffusive exchange of substances and/or organisms between well-mixed reactors.
 Finally, a system (\code{\link{system-class}}) consists of a single reactor or a set of isolated or linked reactors and can be used to describe a community or meta-community model of an ecosystem and the biogeochemical cycles. \cr\cr
-
 Once a model is described by an object of the class system (\code{\link{system-class}}), simulations can be performed using the member function \cr\cr
-\code{\link{calcres}}, \cr\cr
+\code{\link{calcres}}. \cr\cr
 This function integrates the system of ordinary differential equations numerically using the function \code{\link{ode}} of the package \code{\link[deSolve:deSolve-package]{deSolve}} and produces time series of the volumes and substance and organisms concentrations as a R matrix.
 The results can be visualized with arbitrary R functions or a summary of all results can be produced with the function \cr\cr
 \code{\link{plotres}}. \cr\cr
+Similarly, sensitivity analyses can be performed with the member function \cr\cr
+\code{\link{calcsens}}. \cr\cr
+This function produces a list of lists of output matrices of the format produced by
+\code{\link{calcres}}.
+The function \code{\link{plotres}} is also able to deal with this slightly more complex
+output format. \cr\cr
 To propagate stochasticity and uncertainty to the results, stochastic parameter time series can be generated with the function \cr\cr
 \code{\link{randou}} \cr\cr
 and parameter samples can be sampled with the function \cr\cr
 \code{\link{randnorm}} \cr\cr
 to get a sample from the predictive distribution by Monte Carlo simulation.
+Again, the results can be plotted with the function \code{\link{plotres}}.
 }
 
 \author{
@@ -192,4 +198,17 @@ plotres(res      = res,    # plot to pdf file
         file     = "ecosim_example_plot2.pdf",
         width    = 8,
         height   = 4)
+
+# Perform sensitivity analysis:
+# =============================
+ 
+res.sens <- calcsens(system,param.sens=c("k.gro.ALG","k.gro.ZOO"))
+
+# Plot results of sensitivity analysis:
+# =====================================
+ 
+plotres(res.sens)              # plot to screen
+
+plotres(res.sens,file="ecosim_example_plot3.pdf")  # plot to pdf file
 }
+

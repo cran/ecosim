@@ -202,5 +202,16 @@ plotres(res      = res,    # plot to pdf file
         file     = "ecosim_example_plot2.pdf",
         width    = 8,
         height   = 4)
-}
 
+# Perform sensitivity analysis:
+# =============================
+ 
+res.sens <- calcsens(system,param.sens=c("k.gro.ALG","k.gro.ZOO"))
+
+# Plot results of sensitivity analysis:
+# =====================================
+ 
+plotres(res.sens)              # plot to screen
+
+plotres(res.sens,file="ecosim_example_plot3.pdf")  # plot to pdf file
+}
