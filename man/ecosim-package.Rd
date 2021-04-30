@@ -13,8 +13,8 @@ Toolbox for Aquatic Ecosystem Modeling
 \tabular{ll}{
 Package: \tab ecosim\cr
 Type: \tab Package\cr
-Version: \tab 1.3-1\cr
-Date: \tab 2019-02-20\cr
+Version: \tab 1.3-2\cr
+Date: \tab 2021-04-30\cr
 License: \tab GPL (>= 2)\cr
 Depends: \tab deSolve, stoichcalc\cr
 }
@@ -29,7 +29,7 @@ Models are built by constructing objects of the classes \cr\cr
 \code{\link{link-class}}, \cr
 \code{\link{system-class}}. \cr\cr
 A transformation processes (\code{\link{process-class}}) is defined by a process rate (expression describing the dependence of the rate on substance or organism concentrations and external influence factors) and stoichiometric coefficients that describe how the rate affects different substances or organisms.
-It is recommended to calculate the stoichiometric coefficients with the function \code{\link{calc.stoich.coef}} of the package \code{\link[stoichcalc:stoichcalc-package]{stoichcalc}} from substance and organism compositions.
+It is recommended to calculate the stoichiometric coefficients with the function \code{\link{calc.stoich.coef}} of the package \code{\link[stoichcalc]{stoichcalc}} from substance and organism compositions.
 The output of this function can directly be used for the process definition.
 A reactor (\code{\link{reactor-class}}) describes a well-mixed compartment of the environment (or of a laboratory system).
 For each reactor, inflow, outflow, substance and organism input and transformation processes can be defined.
@@ -37,7 +37,7 @@ A link (\code{\link{link-class}}) describes advective and/or diffusive exchange 
 Finally, a system (\code{\link{system-class}}) consists of a single reactor or a set of isolated or linked reactors and can be used to describe a community or meta-community model of an ecosystem and the biogeochemical cycles. \cr\cr
 Once a model is described by an object of the class system (\code{\link{system-class}}), simulations can be performed using the member function \cr\cr
 \code{\link{calcres}}. \cr\cr
-This function integrates the system of ordinary differential equations numerically using the function \code{\link{ode}} of the package \code{\link[deSolve:deSolve-package]{deSolve}} and produces time series of the volumes and substance and organisms concentrations as a R matrix.
+This function integrates the system of ordinary differential equations numerically using the function \code{\link{ode}} of the package \code{\link[deSolve]{deSolve}} and produces time series of the volumes and substance and organisms concentrations as a R matrix.
 The results can be visualized with arbitrary R functions or a summary of all results can be produced with the function \cr\cr
 \code{\link{plotres}}. \cr\cr
 Similarly, sensitivity analyses can be performed with the member function \cr\cr
@@ -71,8 +71,8 @@ Soetaert, K., Cash, J., and Mazzia, F. Solving Differential Equations in R. Spri
 \keyword{ package }
 
 \seealso{
-\code{\link[deSolve:deSolve-package]{deSolve}},
-\code{\link[stoichcalc:stoichcalc-package]{stoichcalc}},
+\code{\link[deSolve]{deSolve}},
+\code{\link[stoichcalc]{stoichcalc}},
 }
 
 \note{The following demos are available:\cr\cr
@@ -185,7 +185,7 @@ res <- calcres(system)
                  
 plotres(res)              # plot to screen
 
-plotres(res,file="ecosim_example_plot1.pdf")  # plot to pdf file
+# plotres(res,file="ecosim_example_plot1.pdf")  # plot to pdf file
 
 plotres(res, colnames=c("C.ALG", "C.ZOO"))  # plot selected variables
 
@@ -193,11 +193,11 @@ plotres(res, colnames=list("C.HPO4",c("C.ALG", "C.ZOO")))
 
 plotres(res[1:100,], colnames=list("C.HPO4",c("C.ALG", "C.ZOO"))) # plot selected time steps
 
-plotres(res      = res,    # plot to pdf file
-        colnames = list("C.HPO4",c("C.ALG","C.ZOO")),
-        file     = "ecosim_example_plot2.pdf",
-        width    = 8,
-        height   = 4)
+# plotres(res      = res,    # plot to pdf file
+#         colnames = list("C.HPO4",c("C.ALG","C.ZOO")),
+#         file     = "ecosim_example_plot2.pdf",
+#         width    = 8,
+#         height   = 4)
 
 # Perform sensitivity analysis:
 # =============================
@@ -209,6 +209,6 @@ res.sens <- calcsens(system,param.sens=c("k.gro.ALG","k.gro.ZOO"))
  
 plotres(res.sens)              # plot to screen
 
-plotres(res.sens,file="ecosim_example_plot3.pdf")  # plot to pdf file
+# plotres(res.sens,file="ecosim_example_plot3.pdf")  # plot to pdf file
 }
 

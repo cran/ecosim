@@ -4,7 +4,7 @@
 # -----------------------------------------------------------------
 #
 # Class definitions                First version: Peter Reichert, Nov.  12, 2005
-# -----------------                Last revision: Peter Reichert, Feb.  12, 2017
+# -----------------                Last revision: Peter Reichert, April 30, 2021
 #
 # ==============================================================================
 
@@ -1231,11 +1231,11 @@ randou <- function(mean=0,sd=1,tau=0.1,y0=NA,t=0:1000/1000,log=FALSE)
 # ==============================================================================
 
 # First version: Peter Reichert, April 09, 2006
-# Last revision: Peter Reichert, February 11, 2017
+# Last revision: Peter Reichert, April 21, 2021
 
 
-# Plot all columns of a matrix using the row labels as the common x-axis
-# ======================================================================
+# Plot all or selected columns of a matrix using the row labels as the common x-axis
+# ==================================================================================
 
 plotres <- function(res,colnames=list(),
                     file=NA,width=7,height=7,
@@ -1340,7 +1340,10 @@ plotres <- function(res,colnames=list(),
       {
         for ( k in 1:K )
         {
-          ymax <- max(ymax,r[[p]][[k]][is.finite(r[[p]][[k]][,cols[[i]][j]]),cols[[i]][j]])
+           if ( cols[[i]][j] %in% colnames(r[[p]][[k]]) )
+           {
+              ymax <- max(ymax,r[[p]][[k]][is.finite(r[[p]][[k]][,cols[[i]][j]]),cols[[i]][j]])
+           }
         }
       }
       main.loc <- main
@@ -1378,7 +1381,14 @@ plotres <- function(res,colnames=list(),
             lty.jk <- lty.loc[recyc(j,length(lty.loc))]
             lwd.jk <- lwd[recyc(j,length(lwd))]
           }
-          lines(as.numeric(row.names(r[[p]][[k]])),r[[p]][[k]][,cols[[i]][j]],col=col.jk,lty=lty.jk,lwd=lwd.jk)
+          if ( cols[[i]][j] %in% colnames(r[[p]][[k]]) )
+          {
+             lines(as.numeric(row.names(r[[p]][[k]])),r[[p]][[k]][,cols[[i]][j]],col=col.jk,lty=lty.jk,lwd=lwd.jk)
+          }
+          else
+          {
+             cat("variable \"",cols[[i]][j],"\" not found\n",sep="")
+          }
           if ( K == 1 | ( k==1 & !labels ) ) 
           {
             leg <- c(leg,cols[[i]][[j]]) 
@@ -1398,7 +1408,7 @@ plotres <- function(res,colnames=list(),
       legend("topright",legend=leg,col=col.leg,lty=lty.leg,lwd=lwd.leg)
     }
 
-    # end loop over different plots:
+    # end loop over different plots
   
   }
 

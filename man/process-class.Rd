@@ -10,7 +10,7 @@
 \description{
 This class represents a transformation process of substances/organisms in the modelled system.
 Such a process is characterized by a transformation rate and a list of stoichiometric coefficients for the affected substances and organisms.
-It is recommended to calculate the stoichiometric coefficients with the function \code{\link{calc.stoich.coef}} of the package \code{\link[stoichcalc:stoichcalc-package]{stoichcalc}} from substance and organism compositions.
+It is recommended to calculate the stoichiometric coefficients with the function \code{\link{calc.stoich.coef}} of the package \code{\link[stoichcalc]{stoichcalc}} from substance and organism compositions.
 The output of this function can directly be used for the process definition.
 }
 

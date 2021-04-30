@@ -9,7 +9,7 @@ Performs a Simulation of the Model Passed as the Argument
 \description{
 Calculates a dynamic solution of the model defined by the argument and returns a numeric matrix with the volumes and substance and organism 
 concentrations of all reactors at all points in time. \cr\cr
-This function integrates the system of ordinary differential equations numerically using the function \code{\link{ode}} of the package \code{\link[deSolve:deSolve-package]{deSolve}}.
+This function integrates the system of ordinary differential equations numerically using the function \code{\link{ode}} of the package \code{\link[deSolve]{deSolve}}.
 The results can be visualized with arbitrary R functions or a summary of all results can be produced with the function \cr\cr
 \code{\link{plotres}}.
 }
@@ -41,11 +41,11 @@ Available algorithms:
 "adams", 
 "impAdams", 
 "impAdams_d".
-See function \code{\link{ode}} of the package \code{\link[deSolve:deSolve-package]{deSolve}} for more details on the integration algorithms.
+See function \code{\link{ode}} of the package \code{\link[deSolve]{deSolve}} for more details on the integration algorithms.
 }
   \item{...}{
 Further arguments are passed to the solver.
-See function \code{\link{ode}} of the package \code{\link[deSolve:deSolve-package]{deSolve}} for more details on the integration algorithms and their control parameters.
+See function \code{\link{ode}} of the package \code{\link[deSolve]{deSolve}} for more details on the integration algorithms and their control parameters.
 }
 }
 
@@ -174,7 +174,7 @@ res <- calcres(system)
                  
 plotres(res)              # plot to screen
 
-plotres(res,file="ecosim_example_plot1.pdf")  # plot to pdf file
+# plotres(res,file="ecosim_example_plot1.pdf")  # plot to pdf file
 
 plotres(res, colnames=c("C.ALG", "C.ZOO"))  # plot selected variables
 
@@ -182,10 +182,10 @@ plotres(res, colnames=list("C.HPO4",c("C.ALG", "C.ZOO")))
 
 plotres(res[1:100,], colnames=list("C.HPO4",c("C.ALG", "C.ZOO"))) # plot selected time steps
 
-plotres(res      = res,    # plot to pdf file
-        colnames = list("C.HPO4",c("C.ALG","C.ZOO")),
-        file     = "ecosim_example_plot2.pdf",
-        width    = 8,
-        height   = 4)
+# plotres(res      = res,    # plot to pdf file
+#         colnames = list("C.HPO4",c("C.ALG","C.ZOO")),
+#         file     = "ecosim_example_plot2.pdf",
+#         width    = 8,
+#         height   = 4)
 }
 

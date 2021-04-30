@@ -159,7 +159,7 @@ res <- calcres(system)
                  
 plotres(res)              # plot to screen
 
-plotres(res,file="ecosim_example_plot1.pdf")  # plot to pdf file
+# plotres(res,file="ecosim_example_plot1.pdf")  # plot to pdf file
 
 plotres(res, colnames=c("C.ALG", "C.ZOO"))  # plot selected variables
 
@@ -167,11 +167,11 @@ plotres(res, colnames=list("C.HPO4",c("C.ALG", "C.ZOO")))
 
 plotres(res[1:100,], colnames=list("C.HPO4",c("C.ALG", "C.ZOO"))) # plot selected time steps
 
-plotres(res      = res,    # plot to pdf file
-        colnames = list("C.HPO4",c("C.ALG","C.ZOO")),
-        file     = "ecosim_example_plot2.pdf",
-        width    = 8,
-        height   = 4)
+# plotres(res      = res,    # plot to pdf file
+#         colnames = list("C.HPO4",c("C.ALG","C.ZOO")),
+#         file     = "ecosim_example_plot2.pdf",
+#         width    = 8,
+#         height   = 4)
 
 # Perform sensitivity analysis:
 # =============================
@@ -183,6 +183,6 @@ res.sens <- calcsens(system,param.sens=c("k.gro.ALG","k.gro.ZOO"))
  
 plotres(res.sens)              # plot to screen
 
-plotres(res.sens,file="ecosim_example_plot3.pdf")  # plot to pdf file
+# plotres(res.sens,file="ecosim_example_plot3.pdf")  # plot to pdf file
 }
 

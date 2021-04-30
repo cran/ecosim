@@ -11,7 +11,7 @@
 This class represents a system consisting of linked reactors, substances/organisms in the reactors and transformation processes. \cr\cr
 Once a model is described by an object of the class system (\code{\link{system-class}}), simulations can be performed using the member function \cr\cr
 \code{\link{calcres}}, \cr\cr
-This function integrates the system of ordinary differential equations numerically using the function \code{\link{ode}} of the package \code{\link[deSolve:deSolve-package]{deSolve}} and produces time series of the volumes and substance and organisms concentrations as a R matrix.
+This function integrates the system of ordinary differential equations numerically using the function \code{\link{ode}} of the package \code{\link[deSolve:deSolve]{deSolve}} and produces time series of the volumes and substance and organisms concentrations as a R matrix.
 The results can be visualized with arbitrary R functions or a summary of all results can be produced with the function \cr\cr
 \code{\link{plotres}}.
 }
