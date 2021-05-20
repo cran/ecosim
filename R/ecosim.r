@@ -1071,20 +1071,37 @@ setMethod(f          = "calcsens",
           signature  = "system",
           definition = function(system, param.sens, scaling.factors=c(1,0.5,2))
             {
-              res <- list()
-              param.orig <- system@param
+              ind.exist <- numeric(0)
               for ( j in 1:length(param.sens) )
               {
-                res[[j]] <- list()
-                for ( i in 1:length(scaling.factors) )
-                {
-                  system@param[[param.sens[j]]] <- system@param[[param.sens[j]]]*scaling.factors[i]
-                  res[[j]][[i]] <- calcres(system)
-                  system@param <- param.orig
-                }
-                names(res[[j]]) <- paste(param.sens[j],scaling.factors,sep="_")
+                 if ( param.sens[j] %in% names(system@param) )
+                 {
+                    ind.exist <- c(ind.exist,j)
+                 }
+                 else
+                 {
+                    cat("*** parameter \"",param.sens[j],"\" not found\n",sep="")
+                 }
               }
-              names(res) <- param.sens
+
+              res <- list()
+              if ( length(ind.exist) > 0 )
+              {
+                param.sens <- param.sens[ind.exist]
+                param.orig <- system@param
+                for ( j in 1:length(param.sens) )
+                {
+                  res[[j]] <- list()
+                  for ( i in 1:length(scaling.factors) )
+                  {
+                    system@param[[param.sens[j]]] <- system@param[[param.sens[j]]]*scaling.factors[i]
+                    res[[j]][[i]] <- calcres(system)
+                    system@param <- param.orig
+                  }
+                  names(res[[j]]) <- paste(param.sens[j],scaling.factors,sep="_")
+                }
+                names(res) <- param.sens
+              }
               
               return(res)  
             })
@@ -1387,7 +1404,7 @@ plotres <- function(res,colnames=list(),
           }
           else
           {
-             cat("variable \"",cols[[i]][j],"\" not found\n",sep="")
+             cat("*** variable \"",cols[[i]][j],"\" not found\n",sep="")
           }
           if ( K == 1 | ( k==1 & !labels ) ) 
           {

@@ -13,8 +13,8 @@ Toolbox for Aquatic Ecosystem Modeling
 \tabular{ll}{
 Package: \tab ecosim\cr
 Type: \tab Package\cr
-Version: \tab 1.3-2\cr
-Date: \tab 2021-04-30\cr
+Version: \tab 1.3-3\cr
+Date: \tab 2021-05-20\cr
 License: \tab GPL (>= 2)\cr
 Depends: \tab deSolve, stoichcalc\cr
 }
