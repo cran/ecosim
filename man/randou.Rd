@@ -40,7 +40,7 @@ Indicator whether the log of the variable should be an Ornstein-Uhlenbeck proces
 }
 
 \author{
-Peter Reichert <peter.reichert@eawag.ch>
+Peter Reichert <peter.reichert@emeriti.eawag.ch>
 }
 
 \seealso{

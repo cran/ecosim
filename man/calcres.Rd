@@ -61,7 +61,7 @@ Soetaert, K., Cash, J., and Mazzia, F. Solving Differential Equations in R. Spri
 }
 
 \author{
-Peter Reichert <peter.reichert@eawag.ch>
+Peter Reichert <peter.reichert@emeriti.eawag.ch>
 }
 
 \seealso{

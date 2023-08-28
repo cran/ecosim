@@ -32,7 +32,7 @@ Sample size.
 }
 
 \author{
-Peter Reichert <peter.reichert@eawag.ch>
+Peter Reichert <peter.reichert@emeriti.eawag.ch>
 }
 
 \seealso{

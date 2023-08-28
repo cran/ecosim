@@ -76,7 +76,7 @@ Optional label(s) of the y axes; values are recycled if more plots are produced 
 }
 
 \author{
-Peter Reichert <peter.reichert@eawag.ch>
+Peter Reichert <peter.reichert@emeriti.eawag.ch>
 }
 
 \seealso{

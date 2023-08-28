@@ -39,7 +39,7 @@ Reichert, P. and Schuwirth, N., A generic framework for deriving process stoichi
 }
 
 \author{
-Peter Reichert <peter.reichert@eawag.ch>
+Peter Reichert <peter.reichert@emeriti.eawag.ch>
 }
 
 \seealso{
